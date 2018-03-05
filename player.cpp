@@ -1,4 +1,8 @@
 #include "player.hpp"
+#include <vector>
+#include <iostream>
+#include <unistd.h>
+using namespace std; 
 
 /*
  * Constructor for the player; initialize everything here. The side your AI is
@@ -8,7 +12,9 @@
 Player::Player(Side side) {
     // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
-n
+    this->side = side; 
+    board = new Board; 
+
     /*
      * TODO: Do any initialization you need to do here (setting up the board,
      * precalculating things, etc.) However, remember that you will only have
@@ -20,6 +26,7 @@ n
  * Destructor for the player.
  */
 Player::~Player() {
+	delete board; //deletes board
 }
 
 /*
@@ -46,13 +53,78 @@ Player::~Player() {
   * returns the move it played. 
   */
   
+Move *Player::moveCount(vector<Move*> moves){
+	cerr<<"Next Move"<<endl; 
+	int weights[8][8]; 
+	for (int i=0; i<8; i++){
+		for (int j=0; j<8; j++){
+			if ((i==0 && j==0) || (i==0 && j==7) || (i==7 && j==0) || (i==7 && j==7)){
+				weights[i][j] = 10; 
+			}
+			else{
+				weights[i][j]=1;
+			}
+		}
+	}
+	for (unsigned int i=0; i<moves.size(); i++){
+		cerr<<"("<<moves[i]->getX()<<", "<<moves[i]->getY()<<")"<<endl;
+		if (moves[i]->getX() == 0 && moves[i]->getY()==0){
+			cerr<<"yesss"<<endl; 
+			return moves[i];  
+		}
+		if (moves[i]->getX() == 0 && moves[i]->getY()==7){
+			cerr<<"yesss"<<endl; 
+			return moves[i]; 
+		}
+		if (moves[i]->getX() == 7 && moves[i]->getY()==0){
+			cerr<<"yesss"<<endl; 
+			return moves[i]; 
+		}
+		if (moves[i]->getX() == 7 && moves[i]->getY()==7){
+			cerr<<"yesss"<<endl; 
+			return moves[i];
+		} 
+		/*if ((moves[i]->getX() == 0 && moves[i]->getY()==1) || (moves[i]->getX() == 1 && moves[i]->getY()==0) || (moves[i]->getX() == 1 && moves[i]->getY()==1) || (moves[i]->getX() == 0 && moves[i]->getY()==6) || (moves[i]->getX() == 1 && moves[i]->getY()==6) || (moves[i]->getX() == 1 && moves[i]->getY()==7) || (moves[i]->getX() == 6 && moves[i]->getY()==0) || (moves[i]->getX() == 6 && moves[i]->getY()==1) || (moves[i]->getX() == 7 && moves[i]->getY()==1) || (moves[i]->getX() == 6 && moves[i]->getY()==7) || (moves[i]->getX() == 6 && moves[i]->getY()==6) || (moves[i]->getX() == 7 && moves[i]->getY()==6)){
+			cerr<<"skip!!!!"<<endl; 
+			break; 
+		}*/
+	}
+	return moves[0]; 
+}
 Move *Player::doMove(Move *opponentsMove, int msLeft) {
     /*
      * TODO: Implement how moves your AI should play here. You should first
      * process the opponent's opponents move before calculating your own move
 	 */
+
+	Side notColor; 
+	//sets opposing team's color 
+	if (side == BLACK){
+		notColor = WHITE; 
+	}
+	else {
+		notColor = BLACK; 
+	}
 	
     //This will be the only function that actually plays the game. But we will make additional helper functions for our algorithm
-
-    return nullptr;
+	
+	board->doMove(opponentsMove, notColor); //does opponent's move
+	vector<Move*> moves; //creates a vector of moves
+	if (board->hasMoves(side)){
+		for (int i=0; i < 8; i++){
+			for (int j=0; j < 8; j++){
+				Move * current_grid = new Move(i, j); //creates new move 
+				if (board->checkMove(current_grid, side)){//checks if move is valid
+					moves.push_back(current_grid); //pushes valid move to vector of moves
+				}
+				else{
+					delete current_grid; 
+				}
+			}
+		}
+		Move * nextMove = moveCount(moves); 
+		board->doMove(nextMove, side); //does move
+		return nextMove; //returns move 
+	}
+    return nullptr; 
 }
