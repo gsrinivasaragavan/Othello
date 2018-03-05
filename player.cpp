@@ -35,10 +35,22 @@ Player::~Player() {
  * The move returned must be legal; if there are no valid moves for your side,
  * return nullptr.
  */
+ 
+ /* Outline
+  * 
+  * recieves oppenents move 
+  * goes through all possible moves
+  * chooses the best move 
+  * plays the move
+  * updates the board
+  * returns the move it played. 
+  */
+  
 Move *Player::doMove(Move *opponentsMove, int msLeft) {
     /*
      * TODO: Implement how moves your AI should play here. You should first
      * process the opponent's opponents move before calculating your own move
-     */
+	*/
+	
     return nullptr;
 }
