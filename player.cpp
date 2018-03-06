@@ -12,7 +12,13 @@ using namespace std;
 Player::Player(Side side) {
     // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
-    this->side = side; 
+    this->side = side;
+    if (side == BLACK){
+		this->otherSide = WHITE; 
+	}
+	else{
+		this->otherSide = BLACK; 
+	}
     board = new Board; 
 
     /*
@@ -26,7 +32,7 @@ Player::Player(Side side) {
  * Destructor for the player.
  */
 Player::~Player() {
-	delete board; //deletes board
+	delete this->board; //deletes board
 }
 
 /*
@@ -55,19 +61,27 @@ Player::~Player() {
   
 Move *Player::moveCount(vector<Move*> moves){
 	cerr<<"Next Move"<<endl; 
-	int weights[8][8]; 
+	int weights[8][8]; //2D array of weights
+	//loop through 2D array 
+	if (moves.size() == 0){
+		return nullptr; 
+	}
 	for (int i=0; i<8; i++){
 		for (int j=0; j<8; j++){
+			//corner pieces 
 			if ((i==0 && j==0) || (i==0 && j==7) || (i==7 && j==0) || (i==7 && j==7)){
 				weights[i][j] = 10; 
 			}
+			//edge pieces
             else if ((2 < i && i < 5 && j ==0) || (2 < i && i < 5 && j == 7) || (i == 0 && 2 < j && j < 5) || (i == 7 && 2 < j && j < 5))
             {
                 weights[i][j] = 5;
             }
+            //pieces next adjacent to the corner
             else if ((i == 0 && j ==1) || (i == 1 && j==0) || (i == 1 && j==1) || (i == 0 && j==6) || (i == 1 && j==6) || (i == 1 && j==7) || (i == 6 && j==0) || (i == 6 && j==1) || (i == 7 && j==1) || (i == 6 && j==7) || (i == 6 && j==6) || (i == 7 && j==6)){
                 weights[i][j] = 1;
             }
+            //remaining pieces 
 			else{
 				weights[i][j]=3; //can create weights in constructor
 			}
@@ -76,84 +90,98 @@ Move *Player::moveCount(vector<Move*> moves){
     Move* moveneeded = moves[0];
     for (unsigned i=0; i<moves.size(); i++)
     {
+		//compares the weights 
         if (weights[moves[i]->getX()][moves[i]->getY()] > weights[moveneeded->getX()][moveneeded->getY()])
         {
             moveneeded = moves[i];
         }
     }
+    //returns best move 
     return moveneeded;
 }
-	/*int counter = 0;
-    for (int i=0; i<moves.size(); i++){
-		cerr<<"("<<moves[i]->getX()<<", "<<moves[i]->getY()<<")"<<endl;
-		if (moves[i]->getX() == 0 && moves[i]->getY()==0){
-			cerr<<"yesss"<<endl; 
-			return moves[i];  
-		}
-		if (moves[i]->getX() == 0 && moves[i]->getY()==7){
-			cerr<<"yesss"<<endl; 
-			return moves[i]; 
-		}
-		if (moves[i]->getX() == 7 && moves[i]->getY()==0){
-			cerr<<"yesss"<<endl; 
-			return moves[i]; 
-		}
-		if (moves[i]->getX() == 7 && moves[i]->getY()==7){
-			cerr<<"yesss"<<endl; 
-			return moves[i];
-		} 
-		if ((moves[i]->getX() == 0 && moves[i]->getY()==1) || (moves[i]->getX() == 1 && moves[i]->getY()==0) || (moves[i]->getX() == 1 && moves[i]->getY()==1) || (moves[i]->getX() == 0 && moves[i]->getY()==6) || (moves[i]->getX() == 1 && moves[i]->getY()==6) || (moves[i]->getX() == 1 && moves[i]->getY()==7) || (moves[i]->getX() == 6 && moves[i]->getY()==0) || (moves[i]->getX() == 6 && moves[i]->getY()==1) || (moves[i]->getX() == 7 && moves[i]->getY()==1) || (moves[i]->getX() == 6 && moves[i]->getY()==7) || (moves[i]->getX() == 6 && moves[i]->getY()==6) || (moves[i]->getX() == 7 && moves[i]->getY()==6)){
-			cerr<<"skip!!!!"<<endl; 
-            if (i==0){
-                if(counter != moves.size()){
-                moves.push_back(moves[i]);
-                moves.erase(moves.begin());
-                i -= 1;
-                counter += 1;
-                cerr<< "erasing" << moves[0]->getX() << moves[0]->getY() <<endl;
-            }
-
-            }
-			continue; 
+//Function will get the Moves a player can do based on the board
+vector<Move*> Player::getMoves(Board *board, Side side){
+	vector<Move*> next_moves; //create vector for next move
+	for (int i=0; i<8; i++){
+		for (int j=0; j<8; j++){
+			Move * current_grid = new Move(i, j, 0); //create new move with iterators and score 0
+			if (board->checkMove(current_grid, side)){ //if move if possible add the moves vector
+				next_moves.push_back(current_grid); 
+			}
 		}
 	}
-    cerr<<moves[0]->getX() << moves[0]->getY() <<endl;
-	return moves[0]; 
-    //42-50
-}*/
+	return next_moves; 
+}
+int Player::depthScore(Board *new_board, int depth, int max_depth){
+	/*vector<Move*> opponents_moves;
+	vector<Move*> our_move; 
+	Move * oppMove;
+	Move * ourMove;*/
+	while(depth < max_depth){
+		vector<Move*> opponents_moves= getMoves(new_board, otherSide); 
+		Move * oppMove = moveCount(opponents_moves); //run hureustic on opponents moves
+		new_board->doMove(oppMove, otherSide); //does opponents move 
+		vector<Move*> our_move = getMoves(new_board, side); //get our moves  
+		Move * ourMove = moveCount(our_move); 
+		new_board->doMove(ourMove, side); //does our move 
+		depth ++; //increment depth 
+	}
+	vector<Move*> opponents_moves = getMoves(new_board, otherSide); 
+	Move * oppMove = moveCount(opponents_moves); 
+	new_board->doMove(oppMove, otherSide);//do opponents move
+	int chosenScore; 
+	//calculates score 
+	if (side == BLACK){
+		chosenScore = new_board->countBlack() - new_board->countWhite(); 
+	}
+	else{
+		chosenScore = new_board->countWhite() - new_board->countBlack(); 
+	}
+	//returns score 
+	return chosenScore; 
+			
+}
+Move *Player::minimax(int depth, int max_depth, vector<Move*> moves, Board *board){
+	//if no possible moves exist
+	if (moves.size() ==0){
+		return nullptr; 
+	} 
+	for (unsigned int i=0; i<moves.size(); i++){
+		//copies board
+		Board *new_board = board->copy();  
+		new_board->doMove(moves[i], side);//does our move
+		vector<Move*> opponents_moves= getMoves(new_board, otherSide); //finds possible moves 
+		if (opponents_moves.size() ==0){//then we want to make this move 
+			return moves[i]; 
+		}
+		moves[i]->score = depthScore(new_board, depth+2, max_depth); 
+	}
+	int bestScore = moves[0]->score; 
+	Move * bestMove = moves[0]; 
+	//finds move with highest score 
+	for (unsigned int i=0; i<moves.size(); i++){
+		if (moves[i]->score > bestScore){
+			bestScore = moves[i]->score; 
+			bestMove = moves[i]; 
+		}
+	}
+	return bestMove; 
+	
+}
+
 Move *Player::doMove(Move *opponentsMove, int msLeft) {
     /*
      * TODO: Implement how moves your AI should play here. You should first
      * process the opponent's opponents move before calculating your own move
 	*/
-	Side notColor; 
-	//sets opposing team's color 
-	if (side == BLACK){
-		notColor = WHITE; 
-	}
-	else {
-		notColor = BLACK; 
-	}
 	
     //This will be the only function that actually plays the game. But we will make additional helper functions for our algorithm
 	
-	board->doMove(opponentsMove, notColor); //does opponent's move
-	vector<Move*> moves; //creates a vector of moves
-	if (board->hasMoves(side)){
-		for (int i=0; i < 8; i++){
-			for (int j=0; j < 8; j++){
-				Move * current_grid = new Move(i, j); //creates new move 
-				if (board->checkMove(current_grid, side)){//checks if move is valid
-					moves.push_back(current_grid); //pushes valid move to vector of moves
-				}
-				else{
-					delete current_grid; 
-				}
-			}
-		}
-		Move * nextMove = moveCount(moves); 
-		board->doMove(nextMove, side); //does move
-		return nextMove; //returns move 
-	}
+	board->doMove(opponentsMove, this->otherSide); //does opponent's move
+	vector<Move*> moves = this->getMoves(board, side); //creates a vector of moves
+		Move * nextMove = minimax(0, 2, moves, board); 
+		board->doMove(nextMove, side); //does next move 
+		return nextMove; //returns next move 
+		
     return nullptr; 
 }

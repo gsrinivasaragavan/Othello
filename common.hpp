@@ -8,18 +8,21 @@ enum Side {
 class Move {
    
 public:
-    int x, y;
-    Move(int x, int y) {
+    int x, y, score;
+    Move(int x, int y, int score) {
         this->x = x;
-        this->y = y;        
+        this->y = y;  
+        this->score = score;       
     }
     ~Move() {}
 
     int getX() { return x; }
     int getY() { return y; }
+    int getScore() {return score;}
 
     void setX(int x) { this->x = x; }
     void setY(int y) { this->y = y; }
+    void setScore(int score) { this->score = score;}
 };
 
 #endif
