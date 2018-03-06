@@ -66,7 +66,8 @@ Move *Player::moveCount(vector<Move*> moves){
 			}
 		}
 	}
-	for (unsigned int i=0; i<moves.size(); i++){
+	int counter = 0;
+    for (int i=0; i<moves.size(); i++){
 		cerr<<"("<<moves[i]->getX()<<", "<<moves[i]->getY()<<")"<<endl;
 		if (moves[i]->getX() == 0 && moves[i]->getY()==0){
 			cerr<<"yesss"<<endl; 
@@ -84,19 +85,30 @@ Move *Player::moveCount(vector<Move*> moves){
 			cerr<<"yesss"<<endl; 
 			return moves[i];
 		} 
-		/*if ((moves[i]->getX() == 0 && moves[i]->getY()==1) || (moves[i]->getX() == 1 && moves[i]->getY()==0) || (moves[i]->getX() == 1 && moves[i]->getY()==1) || (moves[i]->getX() == 0 && moves[i]->getY()==6) || (moves[i]->getX() == 1 && moves[i]->getY()==6) || (moves[i]->getX() == 1 && moves[i]->getY()==7) || (moves[i]->getX() == 6 && moves[i]->getY()==0) || (moves[i]->getX() == 6 && moves[i]->getY()==1) || (moves[i]->getX() == 7 && moves[i]->getY()==1) || (moves[i]->getX() == 6 && moves[i]->getY()==7) || (moves[i]->getX() == 6 && moves[i]->getY()==6) || (moves[i]->getX() == 7 && moves[i]->getY()==6)){
+		if ((moves[i]->getX() == 0 && moves[i]->getY()==1) || (moves[i]->getX() == 1 && moves[i]->getY()==0) || (moves[i]->getX() == 1 && moves[i]->getY()==1) || (moves[i]->getX() == 0 && moves[i]->getY()==6) || (moves[i]->getX() == 1 && moves[i]->getY()==6) || (moves[i]->getX() == 1 && moves[i]->getY()==7) || (moves[i]->getX() == 6 && moves[i]->getY()==0) || (moves[i]->getX() == 6 && moves[i]->getY()==1) || (moves[i]->getX() == 7 && moves[i]->getY()==1) || (moves[i]->getX() == 6 && moves[i]->getY()==7) || (moves[i]->getX() == 6 && moves[i]->getY()==6) || (moves[i]->getX() == 7 && moves[i]->getY()==6)){
 			cerr<<"skip!!!!"<<endl; 
-			break; 
-		}*/
+            if (i==0){
+                if(counter != moves.size()){
+                moves.push_back(moves[i]);
+                moves.erase(moves.begin());
+                i -= 1;
+                counter += 1;
+                cerr<< "erasing" << moves[0]->getX() << moves[0]->getY() <<endl;
+            }
+
+            }
+			continue; 
+		}
 	}
+    cerr<<moves[0]->getX() << moves[0]->getY() <<endl;
 	return moves[0]; 
+    //42-50
 }
 Move *Player::doMove(Move *opponentsMove, int msLeft) {
     /*
      * TODO: Implement how moves your AI should play here. You should first
      * process the opponent's opponents move before calculating your own move
-	 */
-
+	*/
 	Side notColor; 
 	//sets opposing team's color 
 	if (side == BLACK){
