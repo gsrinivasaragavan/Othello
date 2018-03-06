@@ -61,12 +61,29 @@ Move *Player::moveCount(vector<Move*> moves){
 			if ((i==0 && j==0) || (i==0 && j==7) || (i==7 && j==0) || (i==7 && j==7)){
 				weights[i][j] = 10; 
 			}
+            else if ((2 < i && i < 5 && j ==0) || (2 < i && i < 5 && j == 7) || (i == 0 && 2 < j && j < 5) || (i == 7 && 2 < j && j < 5))
+            {
+                weights[i][j] = 5;
+            }
+            else if ((i == 0 && j ==1) || (i == 1 && j==0) || (i == 1 && j==1) || (i == 0 && j==6) || (i == 1 && j==6) || (i == 1 && j==7) || (i == 6 && j==0) || (i == 6 && j==1) || (i == 7 && j==1) || (i == 6 && j==7) || (i == 6 && j==6) || (i == 7 && j==6)){
+                weights[i][j] = 1;
+            }
 			else{
-				weights[i][j]=1;
+				weights[i][j]=3; //can create weights in constructor
 			}
 		}
 	}
-	int counter = 0;
+    Move* moveneeded = moves[0];
+    for (unsigned i=0; i<moves.size(); i++)
+    {
+        if (weights[moves[i]->getX()][moves[i]->getY()] > weights[moveneeded->getX()][moveneeded->getY()])
+        {
+            moveneeded = moves[i];
+        }
+    }
+    return moveneeded;
+}
+	/*int counter = 0;
     for (int i=0; i<moves.size(); i++){
 		cerr<<"("<<moves[i]->getX()<<", "<<moves[i]->getY()<<")"<<endl;
 		if (moves[i]->getX() == 0 && moves[i]->getY()==0){
@@ -103,7 +120,7 @@ Move *Player::moveCount(vector<Move*> moves){
     cerr<<moves[0]->getX() << moves[0]->getY() <<endl;
 	return moves[0]; 
     //42-50
-}
+}*/
 Move *Player::doMove(Move *opponentsMove, int msLeft) {
     /*
      * TODO: Implement how moves your AI should play here. You should first
