@@ -60,7 +60,6 @@ Player::~Player() {
   */
   
 Move *Player::moveCount(vector<Move*> moves){
-	cerr<<"Next Move"<<endl; 
 	int weights[8][8]; //2D array of weights
 	//loop through 2D array 
 	if (moves.size() == 0){
