@@ -59,10 +59,66 @@ Player::~Player() {
   * returns the move it played. 
   */
   
+//Function will get the Moves a player can do based on the board
+vector<Move*> Player::getMoves(Board *board, Side side){
+	vector<Move*> next_moves; //create vector for next move
+	for (int i=0; i<8; i++){
+		for (int j=0; j<8; j++){
+			Move * current_grid = new Move(i, j, 0); //create new move with iterators and score 0
+			if (board->checkMove(current_grid, side)){ //if move if possible add the moves vector
+				next_moves.push_back(current_grid); 
+			}
+		}
+	}
+	return next_moves; 
+}
+
 Move *Player::moveCount(vector<Move*> moves){
+	cerr<<"Next Move"<<endl; 
 	int weights[8][8]; //2D array of weights
+	//assign the weight of each move a value
+	for (unsigned i = 0; i < moves.size(); i++)
+	{
+	
+		//corners
+		if ((moves[i]->getX() == 0 && moves[i]->getY() == 0) || (moves[i]->getX() == 0 && moves[i]->getY() == 7) || (moves[i]->getX() == 7 && moves[i]->getY() == 0) || (moves[i]->getX() == 7 && moves[i]->getY() == 7))
+		{
+			moves[i]->weight = 10;
+		}
+		else if ((2 < moves[i]->getX() && moves[i]->getX() < 0 && moves[i]->getY() == 0) || (2 < moves[i]->getX() && moves[i]->getX() < 5 && moves[i]->getY() == 7) || (moves[i]->getX() == 0 && 2 < moves[i]->getY() && moves[i]->getY() < 5) || (moves[i]->getX() == 7 && 2 < moves[i]->getY() && moves[i]->getY() < 5)){
+			moves[i]->weight = 5;
+		}
+		else if  ((moves[i]->getX() == 0 && moves[i]->getY() ==1) || (moves[i]->getX() == 1 && moves[i]->getY()==0) || (moves[i]->getX() == 1 && moves[i]->getY()==1) || (moves[i]->getX() == 0 && moves[i]->getY()==6) || (moves[i]->getX() == 1 && moves[i]->getY()==6) || (moves[i]->getX() == 1 && moves[i]->getY()==7) || (moves[i]->getX() == 6 && moves[i]->getY()==0) || (moves[i]->getX() == 6 && moves[i]->getY()==1) || (moves[i]->getX() == 7 && moves[i]->getY()==1) || (moves[i]->getX() == 6 && moves[i]->getY()==7) || (moves[i]->getX() == 6 && moves[i]->getY()==6) || (moves[i]->getX() == 7 && moves[i]->getY()==6)){
+			moves[i]->weight = 1;
+		}
+		else{
+			moves[i]->weight = 3;
+		}
+	}
+	//We will calculate the amount of moves possible for the opponent after the current move is picked- want to minimize this
+	//create a board, based on move we do, getmoves for opponent based on current board state. Not sure if we need to make board an argument to the 
+	//function to do this, then have to switch all code that uses moveCount and add a board to its argument
+	//find a way to weight the number of moves with respect to the weights of the board pieces. 
+	for (unsigned i = 0; i < moves.size(); i++)
+	{
+
+	}
+
+	Move* moveneeded = moves[0];
+	for (unsigned i=0; i<moves.size(); i++)
+    {
+		//compares the weights 
+        if (moves[i]->weight > moves[0]->weight)
+        {
+            moveneeded = moves[i];
+        }
+    }
+    return moveneeded;
+	
+
+
 	//loop through 2D array 
-	if (moves.size() == 0){
+	/*if (moves.size() == 0){
 		return nullptr; 
 	}
 	for (int i=0; i<8; i++){
@@ -86,6 +142,7 @@ Move *Player::moveCount(vector<Move*> moves){
 			}
 		}
 	}
+	//now every point on the board has a weight assigned to it. Should now set heurestic score equal to that weight
     Move* moveneeded = moves[0];
     for (unsigned i=0; i<moves.size(); i++)
     {
@@ -96,21 +153,10 @@ Move *Player::moveCount(vector<Move*> moves){
         }
     }
     //returns best move 
-    return moveneeded;
+    
+    return moveneeded;*/
 }
-//Function will get the Moves a player can do based on the board
-vector<Move*> Player::getMoves(Board *board, Side side){
-	vector<Move*> next_moves; //create vector for next move
-	for (int i=0; i<8; i++){
-		for (int j=0; j<8; j++){
-			Move * current_grid = new Move(i, j, 0); //create new move with iterators and score 0
-			if (board->checkMove(current_grid, side)){ //if move if possible add the moves vector
-				next_moves.push_back(current_grid); 
-			}
-		}
-	}
-	return next_moves; 
-}
+
 int Player::depthScore(Board *new_board, int depth, int max_depth){
 	/*vector<Move*> opponents_moves;
 	vector<Move*> our_move; 
@@ -178,7 +224,8 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 	
 	board->doMove(opponentsMove, this->otherSide); //does opponent's move
 	vector<Move*> moves = this->getMoves(board, side); //creates a vector of moves
-		Move * nextMove = minimax(0, 2, moves, board); 
+		//Move * nextMove = minimax(0, 20, moves, board);
+		Move* nextMove = moveCount(moves); 
 		board->doMove(nextMove, side); //does next move 
 		return nextMove; //returns next move 
 		
