@@ -73,8 +73,11 @@ vector<Move*> Player::getMoves(Board *board, Side side){
 	return next_moves; 
 }
 
-Move *Player::moveCount(vector<Move*> moves){
+Move *Player::moveCount(vector<Move*> moves, Board *board){
 	cerr<<"Next Move"<<endl; 
+	if (moves.size() == 0 ){
+		return nullptr; 
+	}
 	int weights[8][8]; //2D array of weights
 	//assign the weight of each move a value
 	for (unsigned i = 0; i < moves.size(); i++)
@@ -95,20 +98,44 @@ Move *Player::moveCount(vector<Move*> moves){
 			moves[i]->weight = 3;
 		}
 	}
+	for (int i=0; i<moves.size(); i++){
+		if (moves[i]->weight == 10){
+			return moves[i]; 
+		}
+	}
 	//We will calculate the amount of moves possible for the opponent after the current move is picked- want to minimize this
 	//create a board, based on move we do, getmoves for opponent based on current board state. Not sure if we need to make board an argument to the 
 	//function to do this, then have to switch all code that uses moveCount and add a board to its argument
 	//find a way to weight the number of moves with respect to the weights of the board pieces. 
+	
+	Board* tempBoard = board->copy();
 	for (unsigned i = 0; i < moves.size(); i++)
 	{
+		tempBoard->doMove(moves[i], side);
+		vector<Move*> oppvector = getMoves(tempBoard, otherSide);
+		if (oppvector.size() == 0){
+			Move * new_move = moves[0]; 
+			for (unsigned int i=0; i<moves.size(); i++){
+				if (moves[i]->weight > new_move->weight)
+		        {
+		            new_move = moves[i];
+		        } 
+			}
+			return new_move;
+		}
+		moves[i]->oppmoves = oppvector.size();
+	}
 
+	for (unsigned i = 0; i < moves.size(); i++)
+	{
+		moves[i]->heurestic_score = moves[i]->weight - moves[i]->oppmoves;
 	}
 
 	Move* moveneeded = moves[0];
 	for (unsigned i=0; i<moves.size(); i++)
     {
 		//compares the weights 
-        if (moves[i]->weight > moves[0]->weight)
+        if (moves[i]->heurestic_score > moveneeded->heurestic_score)
         {
             moveneeded = moves[i];
         }
@@ -163,16 +190,20 @@ int Player::depthScore(Board *new_board, int depth, int max_depth){
 	Move * oppMove;
 	Move * ourMove;*/
 	while(depth < max_depth){
+		cerr<< "while loop depth Score" << endl;
 		vector<Move*> opponents_moves= getMoves(new_board, otherSide); 
-		Move * oppMove = moveCount(opponents_moves); //run hureustic on opponents moves
+		Move * oppMove = moveCount(opponents_moves, new_board); //run hureustic on opponents moves
 		new_board->doMove(oppMove, otherSide); //does opponents move 
+		cerr<< "does opponents move"<<endl; 
 		vector<Move*> our_move = getMoves(new_board, side); //get our moves  
-		Move * ourMove = moveCount(our_move); 
+		Move * ourMove = moveCount(our_move, new_board); 
 		new_board->doMove(ourMove, side); //does our move 
+		cerr <<"does our move"<<endl; 
 		depth ++; //increment depth 
 	}
+	cerr<< "outside while loop depth score" << endl;
 	vector<Move*> opponents_moves = getMoves(new_board, otherSide); 
-	Move * oppMove = moveCount(opponents_moves); 
+	Move * oppMove = moveCount(opponents_moves, new_board); 
 	new_board->doMove(oppMove, otherSide);//do opponents move
 	int chosenScore; 
 	//calculates score 
@@ -195,10 +226,12 @@ Move *Player::minimax(int depth, int max_depth, vector<Move*> moves, Board *boar
 		//copies board
 		Board *new_board = board->copy();  
 		new_board->doMove(moves[i], side);//does our move
+		cerr << "for loop new board minimax" << endl;
 		vector<Move*> opponents_moves= getMoves(new_board, otherSide); //finds possible moves 
 		if (opponents_moves.size() ==0){//then we want to make this move 
 			return moves[i]; 
 		}
+		cerr << "if statement for loop minimax" << endl;
 		moves[i]->score = depthScore(new_board, depth+2, max_depth); 
 	}
 	int bestScore = moves[0]->score; 
@@ -220,12 +253,10 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * process the opponent's opponents move before calculating your own move
 	*/
 	
-    //This will be the only function that actually plays the game. But we will make additional helper functions for our algorithm
-	
+    //This will be the only function that actually plays the game. But we will make additional helper functions for our algorithm 
 	board->doMove(opponentsMove, this->otherSide); //does opponent's move
 	vector<Move*> moves = this->getMoves(board, side); //creates a vector of moves
-		//Move * nextMove = minimax(0, 20, moves, board);
-		Move* nextMove = moveCount(moves); 
+		Move * nextMove = minimax(0, 4, moves, board); 
 		board->doMove(nextMove, side); //does next move 
 		return nextMove; //returns next move 
 		

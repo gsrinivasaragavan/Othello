@@ -60,7 +60,7 @@ bool Board::isDone() {
 bool Board::hasMoves(Side side) {
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
-            Move move(i, j);
+            Move move(i, j,0);
             if (checkMove(&move, side)) return true;
         }
     }

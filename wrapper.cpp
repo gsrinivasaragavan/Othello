@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
     while (cin >> moveX >> moveY >> msLeft) {
         Move *opponentsMove = nullptr;
         if (moveX >= 0 && moveY >= 0) {
-            opponentsMove = new Move(moveX, moveY);
+            opponentsMove = new Move(moveX, moveY,0);
         }
 
         // Get player's move and output to java wrapper.
