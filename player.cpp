@@ -78,7 +78,6 @@ Move *Player::moveCount(vector<Move*> moves, Board *board){
 	if (moves.size() == 0 ){
 		return nullptr; 
 	}
-	int weights[8][8]; //2D array of weights
 	//assign the weight of each move a value
 	for (unsigned i = 0; i < moves.size(); i++)
 	{
@@ -98,11 +97,31 @@ Move *Player::moveCount(vector<Move*> moves, Board *board){
 			moves[i]->weight = 3;
 		}
 	}
-	for (int i=0; i<moves.size(); i++){
+	for (unsigned int i=0; i<moves.size(); i++){
 		if (moves[i]->weight == 10){
 			return moves[i]; 
 		}
 	}
+	for (unsigned int k=0; k<moves.size(); k++){
+		Board * newBoard = board->copy(); 
+		vector<Move*> opponentsMove = getMoves(newBoard, otherSide); 
+		for (unsigned int i=0; i<opponentsMove.size(); i++){
+			if ((opponentsMove[i]->getX() == 0 && opponentsMove[i]->getY() == 0) || (opponentsMove[i]->getX() == 0 && opponentsMove[i]->getY() == 7) || (opponentsMove[i]->getX() == 7 && opponentsMove[i]->getY() == 0) || (opponentsMove[i]->getX() == 7 && opponentsMove[i]->getY() == 7))
+			{
+				opponentsMove[i]->weight = 10;
+			}
+			else{
+				opponentsMove[i]->weight =1; 
+			}
+		}
+		for (unsigned int j=0; j<opponentsMove.size(); j++){
+			if (opponentsMove[j]->weight == 10){
+				moves[k]->weight = 1; 
+			}
+		}
+		delete newBoard; 
+	}
+			
 	//We will calculate the amount of moves possible for the opponent after the current move is picked- want to minimize this
 	//create a board, based on move we do, getmoves for opponent based on current board state. Not sure if we need to make board an argument to the 
 	//function to do this, then have to switch all code that uses moveCount and add a board to its argument
@@ -141,47 +160,6 @@ Move *Player::moveCount(vector<Move*> moves, Board *board){
         }
     }
     return moveneeded;
-	
-
-
-	//loop through 2D array 
-	/*if (moves.size() == 0){
-		return nullptr; 
-	}
-	for (int i=0; i<8; i++){
-		for (int j=0; j<8; j++){
-			//corner pieces 
-			if ((i==0 && j==0) || (i==0 && j==7) || (i==7 && j==0) || (i==7 && j==7)){
-				weights[i][j] = 10; 
-			}
-			//edge pieces
-            else if ((2 < i && i < 5 && j ==0) || (2 < i && i < 5 && j == 7) || (i == 0 && 2 < j && j < 5) || (i == 7 && 2 < j && j < 5))
-            {
-                weights[i][j] = 5;
-            }
-            //pieces next adjacent to the corner
-            else if ((i == 0 && j ==1) || (i == 1 && j==0) || (i == 1 && j==1) || (i == 0 && j==6) || (i == 1 && j==6) || (i == 1 && j==7) || (i == 6 && j==0) || (i == 6 && j==1) || (i == 7 && j==1) || (i == 6 && j==7) || (i == 6 && j==6) || (i == 7 && j==6)){
-                weights[i][j] = 1;
-            }
-            //remaining pieces 
-			else{
-				weights[i][j]=3; //can create weights in constructor
-			}
-		}
-	}
-	//now every point on the board has a weight assigned to it. Should now set heurestic score equal to that weight
-    Move* moveneeded = moves[0];
-    for (unsigned i=0; i<moves.size(); i++)
-    {
-		//compares the weights 
-        if (weights[moves[i]->getX()][moves[i]->getY()] > weights[moveneeded->getX()][moveneeded->getY()])
-        {
-            moveneeded = moves[i];
-        }
-    }
-    //returns best move 
-    
-    return moveneeded;*/
 }
 
 int Player::depthScore(Board *new_board, int depth, int max_depth){
@@ -252,7 +230,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * TODO: Implement how moves your AI should play here. You should first
      * process the opponent's opponents move before calculating your own move
 	*/
-	
+	sleep(1.5); 
     //This will be the only function that actually plays the game. But we will make additional helper functions for our algorithm 
 	board->doMove(opponentsMove, this->otherSide); //does opponent's move
 	vector<Move*> moves = this->getMoves(board, side); //creates a vector of moves
