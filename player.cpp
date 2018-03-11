@@ -74,7 +74,6 @@ vector<Move*> Player::getMoves(Board *board, Side side){
 }
 
 Move *Player::moveCount(vector<Move*> moves, Board *board){
-	cerr<<"Next Move"<<endl; 
 	if (moves.size() == 0 ){
 		return nullptr; 
 	}
@@ -168,18 +167,14 @@ int Player::depthScore(Board *new_board, int depth, int max_depth){
 	Move * oppMove;
 	Move * ourMove;*/
 	while(depth < max_depth){
-		cerr<< "while loop depth Score" << endl;
 		vector<Move*> opponents_moves= getMoves(new_board, otherSide); 
 		Move * oppMove = moveCount(opponents_moves, new_board); //run hureustic on opponents moves
 		new_board->doMove(oppMove, otherSide); //does opponents move 
-		cerr<< "does opponents move"<<endl; 
 		vector<Move*> our_move = getMoves(new_board, side); //get our moves  
 		Move * ourMove = moveCount(our_move, new_board); 
-		new_board->doMove(ourMove, side); //does our move 
-		cerr <<"does our move"<<endl; 
+		new_board->doMove(ourMove, side); //does our move  
 		depth ++; //increment depth 
 	}
-	cerr<< "outside while loop depth score" << endl;
 	vector<Move*> opponents_moves = getMoves(new_board, otherSide); 
 	Move * oppMove = moveCount(opponents_moves, new_board); 
 	new_board->doMove(oppMove, otherSide);//do opponents move
@@ -204,12 +199,10 @@ Move *Player::minimax(int depth, int max_depth, vector<Move*> moves, Board *boar
 		//copies board
 		Board *new_board = board->copy();  
 		new_board->doMove(moves[i], side);//does our move
-		cerr << "for loop new board minimax" << endl;
 		vector<Move*> opponents_moves= getMoves(new_board, otherSide); //finds possible moves 
 		if (opponents_moves.size() ==0){//then we want to make this move 
 			return moves[i]; 
 		}
-		cerr << "if statement for loop minimax" << endl;
 		moves[i]->score = depthScore(new_board, depth+2, max_depth); 
 	}
 	int bestScore = moves[0]->score; 
