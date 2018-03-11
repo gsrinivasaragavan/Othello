@@ -230,7 +230,6 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * TODO: Implement how moves your AI should play here. You should first
      * process the opponent's opponents move before calculating your own move
 	*/
-	sleep(1.5); 
     //This will be the only function that actually plays the game. But we will make additional helper functions for our algorithm 
 	board->doMove(opponentsMove, this->otherSide); //does opponent's move
 	vector<Move*> moves = this->getMoves(board, side); //creates a vector of moves
