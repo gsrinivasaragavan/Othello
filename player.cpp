@@ -84,38 +84,50 @@ Move *Player::moveCount(vector<Move*> moves, Board *board){
 		//corners
 		if ((moves[i]->getX() == 0 && moves[i]->getY() == 0) || (moves[i]->getX() == 0 && moves[i]->getY() == 7) || (moves[i]->getX() == 7 && moves[i]->getY() == 0) || (moves[i]->getX() == 7 && moves[i]->getY() == 7))
 		{
-			moves[i]->weight = 10;
+			moves[i]->weight = 4;
 		}
 		else if ((2 < moves[i]->getX() && moves[i]->getX() < 0 && moves[i]->getY() == 0) || (2 < moves[i]->getX() && moves[i]->getX() < 5 && moves[i]->getY() == 7) || (moves[i]->getX() == 0 && 2 < moves[i]->getY() && moves[i]->getY() < 5) || (moves[i]->getX() == 7 && 2 < moves[i]->getY() && moves[i]->getY() < 5)){
-			moves[i]->weight = 5;
+			moves[i]->weight = 2;
 		}
-		else if  ((moves[i]->getX() == 0 && moves[i]->getY() ==1) || (moves[i]->getX() == 1 && moves[i]->getY()==0) || (moves[i]->getX() == 1 && moves[i]->getY()==1) || (moves[i]->getX() == 0 && moves[i]->getY()==6) || (moves[i]->getX() == 1 && moves[i]->getY()==6) || (moves[i]->getX() == 1 && moves[i]->getY()==7) || (moves[i]->getX() == 6 && moves[i]->getY()==0) || (moves[i]->getX() == 6 && moves[i]->getY()==1) || (moves[i]->getX() == 7 && moves[i]->getY()==1) || (moves[i]->getX() == 6 && moves[i]->getY()==7) || (moves[i]->getX() == 6 && moves[i]->getY()==6) || (moves[i]->getX() == 7 && moves[i]->getY()==6)){
+		else if  ((moves[i]->getX() == 0 && moves[i]->getY() ==1) || (moves[i]->getX() == 1 && moves[i]->getY()==0) || (moves[i]->getX() == 0 && moves[i]->getY()==6) || (moves[i]->getX() == 1 && moves[i]->getY()==7) || (moves[i]->getX() == 6 && moves[i]->getY()==0) || (moves[i]->getX() == 7 && moves[i]->getY()==1) || (moves[i]->getX() == 6 && moves[i]->getY()==7) || (moves[i]->getX() == 7 && moves[i]->getY()==6)){
+			moves[i]->weight = -8;
+		}
+		else if ((moves[i]->getX() == 1 && moves[i]->getY()==1) || (moves[i]->getX() == 1 && moves[i]->getY()==6) || (moves[i]->getX() == 6 && moves[i]->getY()==6) || (moves[i]->getX() == 6 && moves[i]->getY()==1)){
+			moves[i]->weight = -9;
+		}
+		else if ((2 < moves[i]->getX() && moves[i]->getX() < 0 && moves[i]->getY() == 1) || (2 < moves[i]->getX() && moves[i]->getX() < 5 && moves[i]->getY() == 6) || (moves[i]->getX() == 1 && 2 < moves[i]->getY() && moves[i]->getY() < 5) || (moves[i]->getX() == 6 && 2 < moves[i]->getY() && moves[i]->getY() < 5)){
+			moves[i]->weight = -1;
+		}
+		else if ((moves[i]->getX() == 3 && moves[i]->getY() == 3) || (moves[i]->getX() == 3 && moves[i]->getY() == 4) || (moves[i]->getX() == 4 && moves[i]->getY() == 4) || (moves[i]->getX() == 4 && moves[i]->getY() == 3) || (moves[i]->getX() == 2 && moves[i]->getY() == 2) || (moves[i]->getX() == 5 && moves[i]->getY() == 2) || (moves[i]->getX() == 2 && moves[i]->getY() == 5) || (moves[i]->getX() == 5 && moves[i]->getY() == 5)){
 			moves[i]->weight = 1;
 		}
 		else{
-			moves[i]->weight = 3;
+			moves[i]->weight = 0;
 		}
 	}
+	//if move is a corner move automatically pick that move
 	for (unsigned int i=0; i<moves.size(); i++){
-		if (moves[i]->weight == 10){
+		if (moves[i]->weight == 4){
 			return moves[i]; 
 		}
 	}
+	//check moves for otherside
 	for (unsigned int k=0; k<moves.size(); k++){
 		Board * newBoard = board->copy(); 
 		vector<Move*> opponentsMove = getMoves(newBoard, otherSide); 
 		for (unsigned int i=0; i<opponentsMove.size(); i++){
 			if ((opponentsMove[i]->getX() == 0 && opponentsMove[i]->getY() == 0) || (opponentsMove[i]->getX() == 0 && opponentsMove[i]->getY() == 7) || (opponentsMove[i]->getX() == 7 && opponentsMove[i]->getY() == 0) || (opponentsMove[i]->getX() == 7 && opponentsMove[i]->getY() == 7))
 			{
-				opponentsMove[i]->weight = 10;
+				opponentsMove[i]->weight = 4;
 			}
 			else{
-				opponentsMove[i]->weight =1; 
+				opponentsMove[i]->weight =-9; 
 			}
 		}
+		//if opponent gets a corenr piece from doing our move, set that move to really low weight
 		for (unsigned int j=0; j<opponentsMove.size(); j++){
-			if (opponentsMove[j]->weight == 10){
-				moves[k]->weight = 1; 
+			if (opponentsMove[j]->weight == 4){
+				moves[k]->weight = -9; 
 			}
 		}
 		delete newBoard; 
@@ -127,6 +139,7 @@ Move *Player::moveCount(vector<Move*> moves, Board *board){
 	//find a way to weight the number of moves with respect to the weights of the board pieces. 
 	
 	Board* tempBoard = board->copy();
+	//if the opponent has no moves return move with highest weight
 	for (unsigned i = 0; i < moves.size(); i++)
 	{
 		tempBoard->doMove(moves[i], side);
@@ -143,10 +156,12 @@ Move *Player::moveCount(vector<Move*> moves, Board *board){
 		}
 		moves[i]->oppmoves = oppvector.size();
 	}
+	
+	//set heurestic score equal to the weight minus the amount of moves 
 
 	for (unsigned i = 0; i < moves.size(); i++)
 	{
-		moves[i]->heurestic_score = moves[i]->weight - moves[i]->oppmoves;
+		moves[i]->heurestic_score = moves[i]->weight - (2 * moves[i]->oppmoves );
 	}
 
 	Move* moveneeded = moves[0];
@@ -226,7 +241,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
     //This will be the only function that actually plays the game. But we will make additional helper functions for our algorithm 
 	board->doMove(opponentsMove, this->otherSide); //does opponent's move
 	vector<Move*> moves = this->getMoves(board, side); //creates a vector of moves
-		Move * nextMove = minimax(0, 4, moves, board); 
+		Move * nextMove = minimax(0, 14, moves, board);
 		board->doMove(nextMove, side); //does next move 
 		return nextMove; //returns next move 
 		
