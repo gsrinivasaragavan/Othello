@@ -241,7 +241,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
     //This will be the only function that actually plays the game. But we will make additional helper functions for our algorithm 
 	board->doMove(opponentsMove, this->otherSide); //does opponent's move
 	vector<Move*> moves = this->getMoves(board, side); //creates a vector of moves
-		Move * nextMove = minimax(0, 14, moves, board);
+		Move * nextMove = minimax(0, 10, moves, board);
 		board->doMove(nextMove, side); //does next move 
 		return nextMove; //returns next move 
 		

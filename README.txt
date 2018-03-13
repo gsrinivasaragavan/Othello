@@ -1,4 +1,5 @@
 Contributions from Group:
+
 Netra:
 - Wrote a working algorithm that was able to play against Simple Player.
 	. Created the Player constructor that initialized the side, otherside, and board. 
@@ -21,7 +22,7 @@ Gokul:
 	. took in a copy of the board and performed our move on the copy
 	. finds all possible moves for the opponent and finds our best move by running the depthScore function
 	. performs the best move
-- Made the weights a aprt of the Move class, as well as a new variable heurestic score into the Move class
+- Made the weights a part of the Move class, as well as a new variable heurestic score into the Move class
 - Found the number of moves an oppoenent can do based on the current move chosen, also made that a part of the Move class.
 
 Improvements:
